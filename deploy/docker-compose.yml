@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:alpine
+    restart: unless-stopped
+    networks:
+      - private
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    ports:
+      - 55432:5432
+    environment: &pgcreds
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  backend:
+    image: artrey/autopg:latest
+    restart: unless-stopped
+    networks:
+      - private
+    depends_on:
+      - postgres
+    volumes:
+      - django-static:/app/static/
+    environment:
+      <<: *pgcreds
+      SECRET_KEY: secret-key
+      ALLOWED_HOSTS: pg.codecontrol.ru
+      CORS_ORIGIN_WHITELIST: https://pg.codecontrol.ru
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    networks:
+      - private
+      - webproxy
+    depends_on:
+      - backend
+    expose:
+      - "80"
+    volumes:
+      - ./nginx.conf/:/etc/nginx/conf.d/
+      - ./logs/:/var/log/nginx/
+      - django-static:/app/static/:ro
+    environment:
+      VIRTUAL_HOST: pg.codecontrol.ru
+      LETSENCRYPT_HOST: pg.codecontrol.ru
+      LETSENCRYPT_EMAIL: oz.sasha.ivanov@gmail.com
+
+volumes:
+  pgdata: {}
+  django-static: {}
+
+networks:
+  private:
+    driver: bridge
+  webproxy:
+    external:
+      name: webproxy

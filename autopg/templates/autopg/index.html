@@ -1,0 +1,73 @@
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <style>
+    h1 {
+      text-align: center;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .alert {
+      text-align: center;
+    }
+
+    .alert ul {
+      margin: 0;
+      text-align: left;
+    }
+
+    .alert-secondary > p {
+      font-weight: bold;
+    }
+
+    .code {
+      text-align: left;
+    }
+
+    .code p {
+      margin: 0;
+    }
+  </style>
+  {% block style %}{% endblock %}
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+  <h1>Создание БД PostgreSQL</h1>
+
+  {% include 'autopg/form_body.html' with btn_title='Создать' %}
+
+  {% if db %}
+    <div class="alert alert-success">Отлично! БД создана!</div>
+    <div class="alert alert-secondary">
+      <p>Команды, которые были выполнены (просто для справки):</p>
+      <div class="code">
+        <p>create user "{{ db.username }}" with password '{{ db.password }}';</p>
+        <p>create database "{{ db.name }}" owner "{{ db.username }}";</p>
+      </div>
+    </div>
+    <div class="alert alert-secondary">
+      <p>Параметры для подключения:</p>
+      <div class="code">
+        database='{{ db.name }}', user='{{ db.username }}', password='{{ db.password }}',
+        host='{{ request.META.HTTP_HOST }}', port=55432
+      </div>
+    </div>
+  {% endif %}
+
+  {% if error %}
+    <div class="alert alert-danger">Ошибка: {{ error }}</div>
+  {% endif %}
+</div>
+</body>
+</html>
