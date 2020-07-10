@@ -5,6 +5,7 @@
 !admin_site/**
 !autopg/**
 !config/**
+!entrypoint.sh
 !manage.py
 !requirements.txt
 
