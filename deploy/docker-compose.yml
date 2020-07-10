@@ -45,7 +45,7 @@ services:
     volumes:
       - ./nginx.conf/:/etc/nginx/nginx.conf
       - ./logs/:/var/log/nginx/
-      - django-static:/app/static/:ro
+      - django-static:/var/www/django/static/:ro
     environment:
       VIRTUAL_HOST: pg.codecontrol.ru
       LETSENCRYPT_HOST: pg.codecontrol.ru
